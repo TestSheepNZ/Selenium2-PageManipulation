@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
@@ -28,7 +29,8 @@ public class addComment {
 		// Create a new instance of the Firefox driver
 		// This copies all the information about the page we've loaded into
 		// the driver object
-		WebDriver driver = new FirefoxDriver();
+		//WebDriver driver = new FirefoxDriver();
+		WebDriver driver = new ChromeDriver();
 
 		// Open our target page ... a previous blog article
 		driver.get("http://testsheepnz.blogspot.co.nz/2016/07/im-hoping-that-this-blog-will-have-most.html");
@@ -38,8 +40,25 @@ public class addComment {
 
 		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
-		// Switch to the frame that comments are in
-		driver.switchTo().frame(4);
+        //Find the frame containing "enter your comment"
+        java.util.List<WebElement> iframes
+        	= driver.findElements(By.tagName("iframe"));
+		int chosenFrame = -1;
+		for (int i=0 ; i < iframes.size() ; i++)
+		{
+			//This moves you back out of the frame you've just been in
+			driver.switchTo().defaultContent();
+			System.out.println("Check frame");
+			
+			//Select the ith frame
+			driver.switchTo().frame(i);
+			if (driver.getPageSource().contains("Enter your comment"))
+			{
+				chosenFrame = i;
+				System.out.println("Found frame");
+				break;
+			}          
+        }
 
 		// Select to comment as "anonymous"
 		Select select = new Select(driver.findElement(By.name("identityMenu")));
